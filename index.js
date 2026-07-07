@@ -1,27 +1,25 @@
-export default async function handler(req, res) {
-  // 1. استقبال الطلب من برنامجك
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+const express = require('express');
+const app = express();
+const port = process.env.PORT || 3000;
 
-  // 2. استخدام مكتبة node-fetch لجلب الرد من Hugging Face
+app.use(express.json());
+
+app.post('/api/chat', async (req, res) => {
   const fetch = (await import('node-fetch')).default;
-
   try {
     const response = await fetch('https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2', {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer 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', // مفتاحك
+        'Authorization': 'Bearer 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',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(req.body)
     });
-
     const data = await response.json();
-    
-    // 3. إرسال الرد إلى تطبيقك
-    return res.status(200).json(data);
+    res.json(data);
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
-}
+});
+
+app.listen(port, () => console.log(Server running on port ${port}));
